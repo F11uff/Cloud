@@ -2,20 +2,27 @@ package main
 
 import (
 	"cloud/Balancer/config"
+	"cloud/Balancer/internal/service"
 	"fmt"
 	"log"
-	"os"
 )
 
 func main() {
-	log.SetOutput(os.Stdout)
-	log.SetFlags(log.LstdFlags | log.Lshortfile) // Логирование в удобном формате(Добавляет в логирование имя файла и время в формате YYYY:MM:DD HH:MM:SS)
+	err := service.InitLogger()
+	defer service.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	cfg, err := config.InitConfig()
 
 	if err != nil {
-		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
+		service.ErrorLogger.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
+
+	service.AppLogger.Println("Hello")
+	service.ErrorLogger.Println("Crit")
 
 	fmt.Printf("%+v\n", cfg)
 
