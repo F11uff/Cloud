@@ -1,35 +1,25 @@
 package models
 
 import (
-	"cloud/Balancer/internal/service"
+	"cloud/Balancer/internal/core"
+	//"cloud/Balancer/internal/service"
+	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"sync/atomic"
 )
 
-type Balancer interface {
-}
-
 type SimpleBalancer struct {
-	proxy    *httputil.ReverseProxy
-	backends []*url.URL
-	counter  uint32
+	Proxy    *httputil.ReverseProxy
+	Backends []*url.URL
+	Counter  uint64
 }
 
-func NewSimpleBalancer(URLS []string) *SimpleBalancer {
-	var sliceURL []*url.URL
+func (sl *SimpleBalancer) NextBackend() *url.URL {
+	n := atomic.AddUint64(&sl.Counter, 1)
+	return core.LiveBackends[(n-1)%uint64(len(core.LiveBackends))]
+}
 
-	for _, urll := range URLS {
-		urlParse, err := url.Parse(urll)
-		if err != nil {
-			service.ErrorLogger.Printf("Failed to parse url: %s", urlParse)
-		}
-
-		sliceURL = append(sliceURL, urlParse)
-	}
-
-	return &SimpleBalancer{
-		proxy:    nil, // нужно работать с http
-		backends: sliceURL,
-		counter:  0,
-	}
+func (sl *SimpleBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	sl.Proxy.ServeHTTP(w, r)
 }

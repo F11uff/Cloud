@@ -23,7 +23,7 @@ func LoggerMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			r.RemoteAddr,
 		)
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(rw, r)
 
 		duration := time.Since(startTime)
 		service.AppLogger.Printf(
