@@ -9,7 +9,7 @@ var (
 	regCount uint32
 )
 
-func ErrorHandler(w http.ResponseWriter, r *http.Request, err error) {
+func Error(w http.ResponseWriter, r *http.Request, err error) {
 	atomic.AddUint32(&regCount, 1) // увеличиваем атомарно счетчик ошибок
 	AppLogger.Printf("!!!ERROR APP: %d: %v", regCount, err)
 	w.WriteHeader(http.StatusBadGateway)

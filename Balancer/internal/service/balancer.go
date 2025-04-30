@@ -32,7 +32,7 @@ func NewSimpleBalancer(URLs []string) (*models.SimpleBalancer, error) {
 	lb := &models.SimpleBalancer{
 		Proxy: &httputil.ReverseProxy{
 			Director:     director,
-			ErrorHandler: ErrorHandler,
+			ErrorHandler: Error,
 		},
 		Backends: backends,
 	}
