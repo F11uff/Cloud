@@ -18,7 +18,7 @@ var (
 
 func InitLogger() error {
 	if err := os.MkdirAll(LOGDIR, 0755); err != nil { // Создание директории для логов. Права drwxr-xr-x
-		return fmt.Errorf("ошибка создания директории логов: %w", err)
+		return fmt.Errorf("Ошибка создания директории логов: %w", err)
 	}
 
 	logPath := filepath.Join(LOGDIR, "app.log") // Название файла логов
@@ -28,7 +28,7 @@ func InitLogger() error {
 	appLogFile, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644) // -rw-r--r--
 
 	if err != nil {
-		return fmt.Errorf("ошибка открытия файла логов: %w", err)
+		return fmt.Errorf("Ошибка открытия файла логов: %w", err)
 	}
 
 	errorLogPath := filepath.Join(LOGDIR, "error.log")
@@ -36,11 +36,11 @@ func InitLogger() error {
 	errLogFile, err = os.OpenFile(errorLogPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 
 	if err != nil {
-		return fmt.Errorf("ошибка открытия файла логов: %w", err)
+		return fmt.Errorf("Ошибка открытия файла логов: %w", err)
 	}
 
-	AppLogger = log.New(appLogFile, "APP: ", log.LstdFlags|log.Lshortfile)
-	ErrorLogger = log.New(errLogFile, "ERROR: ", log.LstdFlags|log.Lshortfile)
+	AppLogger = log.New(appLogFile, "APP: ", log.LstdFlags|log.Llongfile) // Флаги, отвечающие за формат выводов лога и путь, где будет вызываться лог
+	ErrorLogger = log.New(errLogFile, "ERROR: ", log.LstdFlags|log.Llongfile)
 
 	return nil
 }

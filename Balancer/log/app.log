@@ -1,2 +1,2 @@
-APP: 2025/04/30 01:01:35 init.go:34: Конфигурация: порт - %v, backends - %v 8080 [http://localhost:8081 http://localhost:8082 http://localhost:8083 http://localhost:8084 http://localhost:8085]
-APP: 2025/04/30 01:01:35 main.go:24: Hello
+APP: 2025/04/30 01:12:55 /Users/amir/Desktop/Cloud/Balancer/config/init.go:34: Конфигурация: порт - %v, backends - %v 8080 [http://localhost:8081 http://localhost:8082 http://localhost:8083 http://localhost:8084 http://localhost:8085]
+APP: 2025/04/30 01:12:55 /Users/amir/Desktop/Cloud/Balancer/cmd/main.go:24: Hello

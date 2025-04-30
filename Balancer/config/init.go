@@ -10,7 +10,7 @@ func InitConfig() (*Config, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 
-	viper.AutomaticEnv()
+	viper.AutomaticEnv() // Чтение переменных
 
 	if err := viper.ReadInConfig(); err != nil {
 		service.AppLogger.Printf("Ошибка чтения конфигурации: %v. Будут выставленны значения по умолчанию", err)
