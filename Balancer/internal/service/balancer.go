@@ -43,18 +43,18 @@ func NewSimpleBalancer(URLs []string) (*models.SimpleBalancer, error) {
 }
 
 func director(req *http.Request) {
-	if len(core.LiveBackends) == 0 {
-		AppLogger.Println("Нет доступных бэкендов для перенаправления")
+	backends := core.LiveBackends
+	if len(backends) == 0 {
+		ErrorLogger.Println("No available backends")
 		return
 	}
 
-	// Round Robin алгоритм
-	n := atomic.AddUint64(&counter, 1)
-	backend := core.LiveBackends[n%uint64(len(core.LiveBackends))]
+	// Round-robin
+	idx := atomic.AddUint64(&counter, 1)
+	backend := backends[idx%uint64(len(backends))]
 
 	req.URL.Scheme = backend.Scheme
 	req.URL.Host = backend.Host
-	req.Header.Set("Host", req.Host)
 	req.Host = backend.Host
 
 	AppLogger.Printf("Перенаправление %s %s → %s",

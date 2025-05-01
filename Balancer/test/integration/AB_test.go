@@ -48,8 +48,8 @@ func TestLoadBalancerWithAB(t *testing.T) {
 		t.Logf("Тест с умеренной нагрузкой завершился с ошибкой: %v\nВывод:\n%s", err, output)
 	}
 
-	t.Log("Запуск теста с высокой нагрузкой (5000 запросов, 170 одновременных)")
-	abCmd = exec.Command("ab", "-n", "5000", "-c", "170", "http://localhost:"+port+"/health")
+	t.Log("Запуск теста с высокой нагрузкой (1000 запросов, 1000 одновременных)")
+	abCmd = exec.Command("ab", "-n", "1000", "-c", "1000", "http://localhost:"+port+"/health")
 	if output, err := abCmd.CombinedOutput(); err != nil {
 		t.Errorf("Тест с высокой нагрузкой завершился с ошибкой: %v\nВывод:\n%s", err, output)
 	}
