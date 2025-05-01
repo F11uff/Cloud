@@ -1,0 +1,8 @@
+FROM golang:1.21-alpine
+
+RUN apk add --no-cache busybox-extras
+WORKDIR /app
+RUN echo "Hello from Backend $BACKEND_NUM" > index.html
+EXPOSE $PORT
+
+CMD ["sh", "-c", "echo \"Starting backend $BACKEND_NUM on port $PORT\" && httpd -f -p $PORT -h /app"]

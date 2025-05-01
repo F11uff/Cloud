@@ -1,0 +1,110 @@
+services:
+  balancer:
+    build:
+      context: .
+      dockerfile: Dockerfile.balancer
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Balancer/config/config.yaml:/app/config.yaml
+    depends_on:
+      backend1:
+        condition: service_healthy
+      backend2:
+        condition: service_healthy
+      backend3:
+        condition: service_healthy
+      backend4:
+        condition: service_healthy
+      backend5:
+        condition: service_healthy
+
+  backend1:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - PORT=8081
+      - BACKEND_NUM=1
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O", "-", "http://localhost:${PORT}" ]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend2:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - PORT=8082
+      - BACKEND_NUM=2
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O", "-", "http://localhost:${PORT}" ]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend3:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - PORT=8083
+      - BACKEND_NUM=3
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O", "-", "http://localhost:${PORT}" ]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend4:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - PORT=8084
+      - BACKEND_NUM=4
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O", "-", "http://localhost:${PORT}" ]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend5:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - PORT=8085
+      - BACKEND_NUM=5
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O", "-", "http://localhost:${PORT}" ]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
