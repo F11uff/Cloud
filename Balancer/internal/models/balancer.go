@@ -2,7 +2,6 @@ package models
 
 import (
 	"cloud/Balancer/internal/core"
-	//"cloud/Balancer/internal/service"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -15,11 +14,23 @@ type SimpleBalancer struct {
 	Counter  uint64
 }
 
-func (sl *SimpleBalancer) NextBackend() *url.URL {
-	n := atomic.AddUint64(&sl.Counter, 1)
+func (sb *SimpleBalancer) NextBackend() *url.URL {
+	if len(sb.Backends) == 0 {
+		return nil
+	}
+
+	n := atomic.AddUint64(&sb.Counter, 1)
 	return core.LiveBackends[(n-1)%uint64(len(core.LiveBackends))]
 }
 
-func (sl *SimpleBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sl.Proxy.ServeHTTP(w, r)
+func (sb *SimpleBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	sb.Proxy.ServeHTTP(w, r)
+}
+
+func (sb *SimpleBalancer) GetBackends() []*url.URL {
+	return sb.Backends
+}
+
+func (sb *SimpleBalancer) SetDirector(director func(*http.Request)) {
+	sb.Proxy.Director = director
 }
