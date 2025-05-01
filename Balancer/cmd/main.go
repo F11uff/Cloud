@@ -41,4 +41,7 @@ func main() {
 	if server.ListenAndServe() != nil {
 		service.ErrorLogger.Fatalf("Ошибка сервера : %v", err)
 	}
+
+	// Надо отловить через sigChan SIGTERM
+	service.AppLogger.Println("Сервер закрыт")
 }
