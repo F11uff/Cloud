@@ -11,10 +11,9 @@ type responseWriter struct {
 	Status int
 }
 
-func LoggerMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func LoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		startTime := time.Now()
-		rw := &responseWriter{w, http.StatusOK}
+		start := time.Now()
 
 		service.AppLogger.Printf(
 			"Started %s %s from %s",
@@ -23,16 +22,13 @@ func LoggerMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			r.RemoteAddr,
 		)
 
-		next.ServeHTTP(rw, r)
+		next.ServeHTTP(w, r)
 
-		duration := time.Since(startTime)
 		service.AppLogger.Printf(
-			"Completed %s %s | Status: %d | Duration: %v",
+			"Completed %s %s in %v",
 			r.Method,
 			r.URL.Path,
-			rw.Status,
-			duration,
+			time.Since(start),
 		)
-
 	})
 }

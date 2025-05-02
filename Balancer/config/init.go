@@ -2,37 +2,30 @@ package config
 
 import (
 	"cloud/Balancer/internal/service"
+	"fmt"
 	"github.com/spf13/viper"
 )
 
 func InitConfig() (*Config, error) {
-	viper.AddConfigPath("../config") // Ищет в папке нужный yaml файл
+	viper.AddConfigPath("../config") //Ищет в папке нужный файл
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
+	viper.AutomaticEnv()
 
-	viper.AutomaticEnv() // Чтение переменных
+	setDefaults() // Чтение переменных
 
 	if err := viper.ReadInConfig(); err != nil {
-		service.AppLogger.Printf("Ошибка чтения конфигурации: %v. Будут выставленны значения по умолчанию", err)
-		viper.SetDefault("http_server.port", 8080)
-		viper.SetDefault("backends", []string{
-			"http://localhost:8081",
-			"http://localhost:8082",
-			"http://localhost:8083",
-			"http://localhost:8084",
-			"http://localhost:8085",
-		})
+		service.AppLogger.Printf("Ошибка чтения конфигурации: %v. Используются значения по умолчанию", err)
 	}
 
 	var cfg Config
-
 	if err := viper.Unmarshal(&cfg); err != nil {
-		service.ErrorLogger.Printf("Произошла ошибка в парсинге файла %v", err)
-		return nil, err
+		service.ErrorLogger.Printf("Ошибка парсинга конфигурации: %v", err)
+		return nil, fmt.Errorf("ошибка парсинга конфигурации: %w", err)
 	}
 
-	service.AppLogger.Println("Конфигурация: порт - %v, backends - %v", cfg.HTTPServer.Port, cfg.Backends)
+	service.AppLogger.Printf("Загружена конфигурация: порт - %d, backends - %v",
+		cfg.HTTPServer.Port, cfg.Backends)
 
 	return &cfg, nil
-
 }

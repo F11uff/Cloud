@@ -1,8 +1,28 @@
 http_server:
   port: 8080
+
 backends:
   - "http://localhost:8081"
   - "http://localhost:8082"
   - "http://localhost:8083"
   - "http://localhost:8084"
   - "http://localhost:8085"
+
+DB:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "postgres"
+  name: "database"
+  sslmode: "disable"
+
+rate_limit:
+  default_capacity: 100
+  default_rate: 10.0
+  special_limits:
+    - api_key: "premium_key"
+      capacity: 1000
+      rate: 100.0
+    - api_key: "vip_key"
+      capacity: 5000
+      rate: 500.0
