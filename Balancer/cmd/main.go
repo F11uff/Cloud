@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime/pprof"
 	"syscall"
 	"time"
 
@@ -66,6 +67,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	prof, err := os.Create("mem.prof")
+	defer prof.Close()
+
+	if err != nil {
+		service.ErrorLogger.Println("Файл для профилирования не создан")
+		service.ErrorLogger.Fatalf("Программа завершается из-за не создания файла mem.prof")
+	}
+
 	cfg, err := config.InitConfig()
 	if err != nil {
 		service.ErrorLogger.Fatalf("Ошибка загрузки конфигурации: %v", err)
@@ -82,6 +91,7 @@ func main() {
 		cfg.DB.Host,
 		cfg.DB.Name,
 	))
+
 	if err != nil {
 		service.ErrorLogger.Fatalf("Ошибка инициализации хранилища: %v", err)
 	}
@@ -102,7 +112,13 @@ func main() {
 	}
 	defer rl.Stop()
 
-	balancer, err := service.NewSimpleBalancer(cfg.Backends)
+	newTransport := &http.Transport{
+		MaxIdleConns:        cfg.Transport.MaxIdleConns,
+		MaxIdleConnsPerHost: cfg.Transport.MaxIdleConnsPerHost,
+		IdleConnTimeout:     cfg.Transport.MaxIdleTimeout,
+	}
+
+	balancer, err := service.NewSimpleBalancer(cfg.Backends, newTransport)
 	if err != nil {
 		service.ErrorLogger.Fatalf("Ошибка инициализации балансировщика: %v", err)
 	}
@@ -128,8 +144,13 @@ func main() {
 		Handler: handlerChain,
 	}
 
+	if err := pprof.WriteHeapProfile(prof); err != nil {
+		service.ErrorLogger.Println("Ошибка с профилированием")
+	}
+
 	shutdownChan := make(chan os.Signal, 1)
 	signal.Notify(shutdownChan, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(shutdownChan)
 
 	go func() {
 		service.AppLogger.Printf("Сервер запущен на порту :%d", cfg.HTTPServer.Port)
@@ -140,9 +161,6 @@ func main() {
 
 	<-shutdownChan
 	service.AppLogger.Println("Получен сигнал завершения")
-
-	//ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	//defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
 		service.ErrorLogger.Printf("Ошибка при завершении работы сервера: %v", err)
