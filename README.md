@@ -5,11 +5,11 @@
 </p>
 
 <p align="center">
-  <h2 align="center"> Архитектура проекта </h2>
-  ![](./ForREADME/diagram.svg)
+  <h3 align="center"> Архитектура проекта </h3>
 
 </p>
 
+![](./ForREADME/Diagram.svg)
 
 ## Основные возможности 
 
